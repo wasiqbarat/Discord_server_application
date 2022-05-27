@@ -8,7 +8,6 @@ public class Data {
     private static HashMap<String, ClientHandler> clients = new HashMap<>();
 
     private Data() {
-        data = new Data();
     }
 
     public static Data getInstance() {
@@ -21,7 +20,8 @@ public class Data {
         clients.put(user, client);
     }
 
-    public void deleteUser(String userName) {
-        clients.remove(userName);
+    public void deleteUser(ClientHandler clientHandler) {
+
+        clients.remove(clientHandler.getUserName());
     }
 }

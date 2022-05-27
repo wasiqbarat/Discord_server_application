@@ -11,7 +11,7 @@ public class ClientHandler implements Runnable {
     private Socket socket;
     private DataInputStream dataInputStream;
     private DataOutputStream dataOutputStream;
-    private Data data = Data.getInstance();
+    private final Data data = Data.getInstance();
     private String userName;
 
     public ClientHandler(Socket socket) {
@@ -19,8 +19,6 @@ public class ClientHandler implements Runnable {
             this.socket = socket;
             dataInputStream = new DataInputStream(socket.getInputStream());
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
-            userName = dataInputStream.readUTF();
-            data.addUser(userName, this);
 
         } catch (Exception e) {
             //this method is for closing streams and socket
@@ -28,17 +26,23 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
     @Override
     public void run() {
         while (socket.isConnected()) {
             try {
-                JSONObject json = new JSONObject(dataInputStream.readUTF());
+                String dataFromClient = dataInputStream.readUTF();
+                System.out.println(dataFromClient);
+
+                JSONObject json = new JSONObject(dataFromClient);
+                userName = json.getString("userName");
+                data.addUser(userName, this);
+
                 RespondFactory factory = RespondFactory.getInstance();
                 Respond respond = factory.getRespond(json, socket);
                 respond.handle();
             } catch (IOException e) {
-                data.deleteUser(this.userName);
+                data.deleteUser(this);
+                System.out.println(e.getMessage());
                 closeEveryThing(socket, dataOutputStream, dataInputStream);
                 e.printStackTrace();
                 break;
@@ -46,11 +50,15 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    public String getUserName() {
+        return userName;
+    }
 
     public void closeEveryThing(Socket socket, DataOutputStream dataOutputStream, DataInputStream dataInputStream) {
         try {
             if (socket != null) {
                 socket.close();
+                data.deleteUser(this);
             }
             if (dataInputStream != null) {
                 dataInputStream.close();

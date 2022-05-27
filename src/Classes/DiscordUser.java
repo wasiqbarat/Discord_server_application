@@ -1,16 +1,21 @@
 package Classes;
 
-public class User {
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class DiscordUser implements Serializable {
     private String userName;
     private String password;
     private String email;
     private String phoneNumber;
+    private ArrayList<DiscordUser> discordFriends;
 
-    public User(String userName, String password, String email, String phoneNumber) {
+    public DiscordUser(String userName, String password, String email, String phoneNumber) {
         this.userName = userName;
         this.password = password;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        discordFriends = new ArrayList<>();
     }
 
     public String getUserName() {
@@ -45,13 +50,12 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "userName='" + userName + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                '}';
+    public ArrayList<DiscordUser> getDiscordFriends() {
+        return discordFriends;
     }
+
+    public void setDiscordFriends(ArrayList<DiscordUser> discordFriends) {
+        this.discordFriends = discordFriends;
+    }
+
 }
