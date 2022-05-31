@@ -10,6 +10,7 @@ public class RespondFactory {
     private Respond respond;
 
     private RespondFactory() {
+
     }
 
     public static RespondFactory getInstance() {

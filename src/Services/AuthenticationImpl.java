@@ -14,7 +14,6 @@ public class AuthenticationImpl implements Authentication {
 
     @Override
     public void logIn(String userName, String password) throws Exception {
-
         discordFile.signIn(userName, password);
     }
 

@@ -3,12 +3,13 @@ package File;
 import Classes.DiscordUser;
 
 import java.io.*;
+
 import Exceptions.*;
 
 public class DiscordFile {
     private static DiscordFile discordFile = null;
 
-    private DiscordFile(){
+    private DiscordFile() {
     }
 
     public static DiscordFile getInstance() {
@@ -19,7 +20,7 @@ public class DiscordFile {
     }
 
 
-    public void signUpUser (DiscordUser discordUser) throws Exception{
+    public void signUpUser(DiscordUser discordUser) throws Exception {
         File usersFolder = new File("Files/Users/");
         String[] usersList = usersFolder.list();
 
@@ -32,7 +33,7 @@ public class DiscordFile {
             }
         }
 
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("Files/Users/" + discordUser.getUserName() + ".bin"))){
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("Files/Users/" + discordUser.getUserName() + ".bin"))) {
             objectOutputStream.writeObject(discordUser);
             System.out.println("yes");
         } catch (IOException e) {
@@ -41,10 +42,38 @@ public class DiscordFile {
 
     }
 
-    public void signIn (String userName, String password) {
+    public void signIn(String userName, String password) throws Exception {
+        File usersFolder = new File("Files/Users/");
+        String[] usersList = usersFolder.list();
+
+        try {
+            DiscordUser discordUser = null;
+            if (usersList != null) {
+                for (String user : usersList) {
+                    if (user.equals(userName + ".bin")) {
+                        FileInputStream fileInputStream = new FileInputStream("Files/Users/" + user);
+                        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                        discordUser = (DiscordUser) objectInputStream.readObject();
+
+
+                        fileInputStream.close();
+                        objectInputStream.close();
+                    }
+                }
+            }
+
+            if (discordUser == null) {
+                throw new userOrPasswordInvalidException();
+            }
+
+            if ( !discordUser.getPassword().equals(password)) {
+                throw new userOrPasswordInvalidException();
+            }
+
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
 
     }
-
-
 
 }

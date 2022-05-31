@@ -18,15 +18,16 @@ public class SignUpRespond extends Respond{
         String password = info.getString("password");
         String email = info.getString("email");
         String phoneNumber = info.getString("phone");
-
         DiscordUser discordUser = new DiscordUser(userName, password, email, phoneNumber);
         AuthenticationImpl authentication = new AuthenticationImpl();
+
         try {
             authentication.signUp(discordUser);
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("exception", false);
             jsonObject.put("method", "signUp");
+            jsonObject.put("process", "logIn");
             parseMessageToJson(jsonObject);
 
         } catch (Exception e) {
