@@ -13,4 +13,15 @@ public abstract class Person implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 }

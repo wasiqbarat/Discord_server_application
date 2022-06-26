@@ -10,6 +10,7 @@ import java.net.Socket;
 
 public class LogInRespond extends Respond {
     private final Data data = Data.getInstance();
+
     public LogInRespond(Socket socket, JSONObject info) {
         super(socket, info);
     }
@@ -25,12 +26,14 @@ public class LogInRespond extends Respond {
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("exception", false);
-            jsonObject.put("method", "logIn");
-            jsonObject.put("process", "logIn");
+            jsonObject.put("method", "loggedIn");
+            jsonObject.put("process", "loggedIn");
+            jsonObject.put("userName", userName);
+            jsonObject.put("password", password);
 
-            parseMessageToJson(jsonObject);
+            parseMessageToJsonAndSendToClient(jsonObject);
         } catch (userOrPasswordInvalidException e) {
-            parseErrorToJson(e);
+            parseErrorToJsonAndSendToClient(e);
         } catch (Exception e) {
             e.printStackTrace();
         }

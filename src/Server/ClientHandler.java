@@ -8,11 +8,11 @@ import java.net.Socket;
 import org.json.JSONObject;
 
 public class ClientHandler implements Runnable {
+    private String userName;
     private Socket socket;
     private DataInputStream dataInputStream;
     private DataOutputStream dataOutputStream;
-    private final Data data = Data.getInstance();
-    private String userName;
+    private final Data serverData = Data.getInstance();
 
     public ClientHandler(Socket socket) {
         try {
@@ -21,7 +21,6 @@ public class ClientHandler implements Runnable {
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
         } catch (Exception e) {
-            //this method is for closing streams and socket
             closeEveryThing(socket, dataOutputStream, dataInputStream);
         }
     }
@@ -31,17 +30,22 @@ public class ClientHandler implements Runnable {
         while (socket.isConnected()) {
             try {
                 String dataFromClient = dataInputStream.readUTF();
+
+                System.out.println("_____________from client_________________");
                 System.out.println(dataFromClient);
+                System.out.println("_________________________________________");
 
                 JSONObject json = new JSONObject(dataFromClient);
                 userName = json.getString("userName");
-                data.addUser(userName, this);
+                serverData.addOnlineUser(userName, this);
 
                 RespondFactory factory = RespondFactory.getInstance();
                 Respond respond = factory.getRespond(json, socket);
                 respond.handle();
-            } catch (IOException e) {
-                data.deleteUser(this);
+
+            } catch (Exception e) {
+                serverData.deleteOfflineUser(this);
+                System.out.println("Nafar rasft");
                 System.out.println(e.getMessage());
                 closeEveryThing(socket, dataOutputStream, dataInputStream);
                 e.printStackTrace();
@@ -49,6 +53,7 @@ public class ClientHandler implements Runnable {
             }
         }
     }
+
 
     public String getUserName() {
         return userName;
@@ -58,7 +63,7 @@ public class ClientHandler implements Runnable {
         try {
             if (socket != null) {
                 socket.close();
-                data.deleteUser(this);
+                serverData.deleteOfflineUser(this);
             }
             if (dataInputStream != null) {
                 dataInputStream.close();
@@ -71,5 +76,6 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         }
     }
+
 
 }

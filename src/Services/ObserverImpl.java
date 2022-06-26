@@ -6,7 +6,7 @@ import Interfaces.Observer;
 
 
 public class ObserverImpl implements Observer {
-    private DiscordFile discordFile = DiscordFile.getInstance();
+    private final DiscordFile discordFile = DiscordFile.getInstance();
 
 
     @Override

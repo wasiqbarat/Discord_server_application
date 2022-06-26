@@ -7,10 +7,7 @@ import java.net.Socket;
 public class RespondFactory {
     private static RespondFactory factory = null;
 
-    private Respond respond;
-
     private RespondFactory() {
-
     }
 
     public static RespondFactory getInstance() {
@@ -25,7 +22,12 @@ public class RespondFactory {
         switch (method) {
             case "signUp" -> respond = new SignUpRespond(socket, json);
             case "logIn" -> respond = new LogInRespond(socket, json);
+            case "friendRequests" -> respond = new FriendRequestsRespond(socket, json);
+            case "friendsList" -> respond = new FriendsListRespond(socket, json);
+            case "privateChat" -> respond = new PrivateChat(socket, json);
+            case "logOut" -> respond = new LogOutRespond(socket, json);
         }
+
         return respond;
     }
 }
