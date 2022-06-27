@@ -33,30 +33,43 @@ public class FriendRequestsRespond extends Respond {
         }
     }
 
+
     private void confirmOrApproveFriendRequests() {
         JSONArray confirmed = info.getJSONArray("confirmedRequests");
         JSONArray approved = info.getJSONArray("approvedRequests");
 
         Iterator iterator1 = confirmed.iterator();
 
+        //getting my friends list from database and manipulate it
         ArrayList<DiscordFriend> discordFriends = dataBase.getFriendsMap().get(info.getString("userName"));
         ArrayList<FriendRequest> friendRequestsArray = dataBase.getFriendRequestMap().get(info.getString("userName"));
-        Iterator iterator = friendRequestsArray.iterator();
 
+        if (friendRequestsArray == null) {
+            friendRequestsArray = new ArrayList<>();
+        }
         if (discordFriends == null) {
             discordFriends = new ArrayList<>();
         }
 
+
+        Iterator iterator = friendRequestsArray.iterator();
         Person user;
+        Person receiver = null;
+
+        ArrayList<DiscordFriend> senderFriends = null;
+        String senderUserName = null;
         while (iterator1.hasNext()) {
-            String userToAdd = (String) iterator1.next();
 
-            String userName = userToAdd.split(" ")[0];
-            File userFile = new File("Files/Users/" + userName + ".bin");
+            String senderUserNameWithData = (String) iterator1.next();
 
-            try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(userFile))) {
+            senderUserName = senderUserNameWithData.split(" ")[0];
+
+            File userFile = new File("Files/Users/" + senderUserName + ".bin");//we need to sender's email and phone
+
+            try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(userFile))) {
                 user = (Person) inputStream.readObject();
 
+                //add sender to my friends list
                 discordFriends.add(new DiscordFriend(user.getUserName(), user.getEmail(), user.getPhoneNumber()));
 
                 //remove friend request from friend requests
@@ -66,6 +79,20 @@ public class FriendRequestsRespond extends Respond {
                     if (friendRequest.getSender().equals(user.getUserName())) {
                         iterator.remove();
                     }
+
+                }
+
+
+                //Add myself as friend to someone who has sent a friend The request
+                //So I need my email and phone number.
+                File friendRequestReceiver = new File("Files/users/" + info.getString("userName") + ".bin");
+
+                try (ObjectInputStream inputStream1 = new ObjectInputStream(new FileInputStream(friendRequestReceiver))) {
+                    receiver = (Person) inputStream1.readObject();
+
+                    senderFriends = dataBase.getFriendsMap().get(senderUserName);
+
+                    senderFriends.add(new DiscordFriend(receiver.getUserName(), receiver.getEmail(), receiver.getPhoneNumber()));
                 }
 
             } catch (IOException | ClassNotFoundException e) {
@@ -74,8 +101,12 @@ public class FriendRequestsRespond extends Respond {
         }
 
 
-        dataBase.getFriendsMap().put(info.getString("userName") , discordFriends);
+        //update database
+        dataBase.getFriendsMap().put(info.getString("userName"), discordFriends);
         dataBase.updateFriendsMap(info.getString("userName"), discordFriends);
+
+        dataBase.getFriendsMap().put(senderUserName, senderFriends);
+        dataBase.updateFriendsMap(senderUserName, senderFriends);
 
         info.put("process", "loggedIn");
         info.put("method", "loggedIn");
@@ -125,7 +156,7 @@ public class FriendRequestsRespond extends Respond {
         JSONArray users = new JSONArray();
 
         for (String userName : usersList) {
-            if (! (info.getString("userName")).equals(userName) ) {
+            if (!(info.getString("userName")).equals(userName)) {
                 users.put(userName);
             }
         }
@@ -149,6 +180,10 @@ public class FriendRequestsRespond extends Respond {
         JSONArray friendRequestsJsonArray = new JSONArray();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm a");
+
+        if (friendRequests == null) {
+            friendRequests = new ArrayList<>();
+        }
 
         for (FriendRequest friendRequest : friendRequests) {
             friendRequestsJsonArray.put(friendRequest.getSender() + "  " + friendRequest.getDateTime().format(formatter));

@@ -26,7 +26,7 @@ public class LogInRespond extends Respond {
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("exception", false);
-            jsonObject.put("method", "loggedIn");
+            jsonObject.put("method", "logIn");
             jsonObject.put("process", "loggedIn");
             jsonObject.put("userName", userName);
             jsonObject.put("password", password);

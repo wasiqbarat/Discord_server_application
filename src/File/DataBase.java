@@ -10,8 +10,9 @@ public class DataBase {
     private static DataBase dataBase = null;
 
     private final DiscordFile fileManager;
-    private final ArrayList<String> usersList;
-    private final HashMap<String, ArrayList<DiscordFriend>> friendsMap;
+    private ArrayList<String> usersList;
+    private HashMap<String, ArrayList<DiscordFriend>> friendsMap;
+
     private final HashMap<String, ArrayList<DiscordFriend>> blockedFriendsMap;
     private final HashMap<String, ArrayList<Message>> messagesMap;
     private HashMap<String, ArrayList<FriendRequest>> friendRequestMap;
@@ -41,10 +42,22 @@ public class DataBase {
 
 
     public HashMap<String, ArrayList<DiscordFriend>> getFriendsMap() {
+        if (friendsMap == null) {
+            friendsMap =  fileManager.loadFriends();
+        }
+
+        friendRequestMap.forEach((key, value) -> {
+            if (value == null) {
+                value = new ArrayList<>();
+            }
+        });
         return friendsMap;
     }
 
     public ArrayList<String> getUsersList() {
+        if (usersList == null) {
+            usersList =  fileManager.loadUsersList();
+        }
         return usersList;
     }
 
@@ -57,12 +70,23 @@ public class DataBase {
     }
 
     public HashMap<String, ArrayList<FriendRequest>> getFriendRequestMap() {
+
+        if (friendRequestMap == null) {
+            friendRequestMap = fileManager.loadFriendRequestMap();
+        }
+
+        friendRequestMap.forEach((key, value) -> {
+            if (value == null) {
+                value = new ArrayList<>();
+            }
+        });
+
         return friendRequestMap;
     }
 
+
     public void updateFriendsMap(String userName, ArrayList<DiscordFriend> discordFriends) {
         friendsMap.put(userName, discordFriends);
-
         fileManager.updateFriendsMap(friendsMap);
     }
 

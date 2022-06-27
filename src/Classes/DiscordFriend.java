@@ -17,5 +17,13 @@ public class DiscordFriend extends Person implements Serializable {
         isBlocked = false;
     }
 
+    public boolean getBlockStatus() {
+        return isBlocked;
+    }
+
+    public void setBlockStatus(boolean blockStatus) {
+        isBlocked = blockStatus;
+    }
+
 
 }

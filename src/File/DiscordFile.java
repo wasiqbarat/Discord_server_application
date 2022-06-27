@@ -83,6 +83,11 @@ public class DiscordFile {
 
         if(!file.exists()) {
             friendsListHashmap = new HashMap<>();
+            ArrayList<String> userList = loadUsersList();
+            for (String user : userList) {
+                ArrayList<DiscordFriend> arrayList = new ArrayList<>();
+                friendsListHashmap.put(user, arrayList);
+            }
 
             try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
                 objectOutputStream.writeObject(friendsListHashmap);
@@ -123,6 +128,12 @@ public class DiscordFile {
 
         if( !file.exists() ) {
             friendRequestMap = new HashMap<>();
+            ArrayList<String> usersList = loadUsersList();
+
+            for (String user : usersList) {
+                ArrayList<FriendRequest> arrayList = new ArrayList<>();
+                friendRequestMap.put(user, arrayList);
+            }
 
             try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
                 objectOutputStream.writeObject(friendRequestMap);
@@ -157,6 +168,7 @@ public class DiscordFile {
     public ArrayList<String> loadUsersList() {
         File usersFolder = new File("Files/Users/");
         String[] usersList1 = usersFolder.list();
+
         ArrayList<String> usersList = new ArrayList<>();
         for (String user : usersList1 ){
             usersList.add(user.split("\\.")[0]);
@@ -165,6 +177,8 @@ public class DiscordFile {
         return usersList;
     }
 
+
+    ///
     public HashMap<String, ArrayList<DiscordFriend>> loadBlockedFriends() {
         File file = new File("DataBase/blockedFriendsMap.bin");
 
