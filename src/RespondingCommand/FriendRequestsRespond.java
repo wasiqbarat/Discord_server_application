@@ -203,5 +203,4 @@ public class FriendRequestsRespond extends Respond {
 
         parseMessageToJsonAndSendToClient(info);
     }
-
 }

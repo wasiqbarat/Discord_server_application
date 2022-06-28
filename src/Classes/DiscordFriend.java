@@ -2,6 +2,12 @@ package Classes;
 
 import java.io.Serializable;
 
+/**
+ * DiscordFriend indicates a discord social network existent
+ *
+ * @author wasiq
+ * @see DiscordUser
+ */
 public class DiscordFriend extends Person implements Serializable {
     boolean isBlocked = false;
 

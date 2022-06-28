@@ -3,7 +3,10 @@ package RespondingCommand;
 import org.json.JSONObject;
 import java.net.Socket;
 
-
+/**
+ * RespondFactory provide responds to client data
+ * this class is in singleton structure
+ */
 public class RespondFactory {
     private static RespondFactory factory = null;
 
@@ -29,8 +32,8 @@ public class RespondFactory {
             case "logOut" -> respond = new LogOutRespond(socket, json);
             case "chat" -> respond = new PrivateChatRespond(socket, json);
             case "loggedIn" -> respond = new LoggedInRespond(socket, json);
+            case "changePassword" -> respond = new ChangePasswordRespond(socket, json);
         }
-
         return respond;
     }
 

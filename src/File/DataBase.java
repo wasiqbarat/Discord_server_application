@@ -1,11 +1,20 @@
 package File;
 
 import Classes.DiscordFriend;
+import Classes.Person;
 import DiscordClasses.FriendRequest;
 import DiscordClasses.Message;
+import Exceptions.UserInvalid;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * DataBase is a simulation of database.
+ * this class stores discord datas
+ *
+ * @see DiscordFile
+ */
 public class DataBase {
     private static DataBase dataBase = null;
 
@@ -68,5 +77,12 @@ public class DataBase {
         fileManager.updateMessagesMap(messagesMap);
     }
 
+    public Person getUser(String userName) throws UserInvalid {
+        return fileManager.getUser(userName);
+    }
+
+    public void updateUser(Person person) throws Exception {
+        fileManager.updateUser(person);
+    }
 
 }

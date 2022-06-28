@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Classes.Person;
 import DiscordClasses.FriendRequest;
 import DiscordClasses.Message;
 import Exceptions.*;
@@ -74,6 +75,32 @@ public class DiscordFile {
         }
     }
 
+    public Person getUser(String userName) throws UserInvalid {
+        File user = new File("Files/Users/" + userName + ".bin");
+        if (user.exists()) {
+            try ( ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(user))){
+                Person person = (Person) objectInputStream.readObject();
+                return person;
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }else throw new UserInvalid();
+
+        return null;
+    }
+
+
+    public void updateUser(Person person) throws Exception {
+        File user = new File("Files/Users/" + person.getUserName() + ".bin");
+
+        if (user.exists()) {
+            try(ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(user))) {
+                outputStream.writeObject(person);
+            } catch (IOException e) {
+                throw new UserInvalid();
+            }
+        }
+    }
 
     public HashMap<String, ArrayList<DiscordFriend>> loadFriends() {
         File file = new File("DataBase/friendsListHashmap.bin");
@@ -118,8 +145,8 @@ public class DiscordFile {
             e.printStackTrace();
         }
     }
-
     //------------------------------------------
+
     public HashMap<String, ArrayList<FriendRequest>> loadFriendRequestMap() {
         File file = new File("DataBase/friendRequestMap.bin");
 
@@ -175,8 +202,8 @@ public class DiscordFile {
 
         return usersList;
     }
-
     ///
+
     public HashMap<String, ArrayList<DiscordFriend>> loadBlockedFriends() {
         File file = new File("DataBase/blockedFriendsMap.bin");
 

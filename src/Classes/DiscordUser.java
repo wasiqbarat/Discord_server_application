@@ -1,16 +1,17 @@
 package Classes;
-
 import java.io.Serializable;
-import java.util.ArrayList;
 
+/**
+ * DiscordUser is a discord user existent
+ *
+ * @author wasiq
+ */
 public class DiscordUser extends Person implements Serializable {
-    private final String password;
-    private final ArrayList<Person> friends;
+    private String password;
 
     public DiscordUser(String userName, String password, String email, String phoneNumber) {
         super(userName, email, phoneNumber);
         this.password = password;
-        friends = new ArrayList<>();
     }
 
     public String getUserName() {
@@ -21,8 +22,8 @@ public class DiscordUser extends Person implements Serializable {
         return password;
     }
 
-
-    public ArrayList<Person> getFriends() {
-        return friends;
+    public void setPassword(String password) {
+        this.password = password;
     }
+
 }

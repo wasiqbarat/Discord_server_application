@@ -2,6 +2,15 @@ package Classes;
 
 import java.io.Serializable;
 
+/**
+ * Person a general class to show a person existent
+ *
+ * @author wasiq
+ *
+ * @see DiscordUser
+ * @see DiscordFriend
+ */
+
 public abstract class Person implements Serializable {
     protected String userName;
     protected String email;
@@ -24,4 +33,5 @@ public abstract class Person implements Serializable {
     public String getPhoneNumber() {
         return phoneNumber;
     }
+
 }
