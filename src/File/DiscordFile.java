@@ -7,7 +7,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import Classes.Person;
 import DiscordClasses.FriendRequest;
 import DiscordClasses.Message;
 import Exceptions.*;
@@ -177,7 +176,6 @@ public class DiscordFile {
         return usersList;
     }
 
-
     ///
     public HashMap<String, ArrayList<DiscordFriend>> loadBlockedFriends() {
         File file = new File("DataBase/blockedFriendsMap.bin");
@@ -197,14 +195,37 @@ public class DiscordFile {
         return blockedFriendsMap;
     }
 
+    public void updateMessagesMap(HashMap<String,ArrayList<Message>> messagesMap) {
+        File file = new File("DataBase/messagesMap.bin");
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file))){
+            outputStream.writeObject(messagesMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public HashMap<String, ArrayList<Message>> loadMessagesMap() {
         File file = new File("DataBase/messagesMap.bin");
 
-        if(!file.exists()) {
-            return new HashMap<>();
-        }
-
         HashMap<String, ArrayList<Message>> messagesMap = null;
+
+        if( !file.exists() ) {
+            messagesMap = new HashMap<>();
+            ArrayList<String> usersList = loadUsersList();
+
+            for (String user : usersList) {
+                ArrayList<Message> arrayList = new ArrayList<>();
+                messagesMap.put(user, arrayList);
+            }
+
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
+                objectOutputStream.writeObject(messagesMap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return messagesMap;
+        }
 
         try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))){
             messagesMap = (HashMap<String, ArrayList<Message>>) inputStream.readObject();

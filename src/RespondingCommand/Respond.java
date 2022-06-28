@@ -1,8 +1,6 @@
 package RespondingCommand;
 
-import Exceptions.InvalidEmail;
 import org.json.JSONObject;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -20,13 +18,12 @@ public abstract class Respond {
     public abstract void handle() throws Exception;
 
     protected void parseErrorToJsonAndSendToClient(Exception e) {
-        JSONObject object = new JSONObject();
-        object.put("exception", true);
-        object.put("cause", e.getMessage());
+        info.put("exception", true);
+        info.put("cause", e.getMessage());
 
         try {
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-            dataOutputStream.writeUTF(object.toString());
+            dataOutputStream.writeUTF(info.toString());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -38,12 +35,13 @@ public abstract class Respond {
             System.out.println("__________________this is sending to client____");
             System.out.println(object);
             System.out.println("_______________________________________________");
+
+
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
             dataOutputStream.writeUTF(object.toString());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
     }
 
 

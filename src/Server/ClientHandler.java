@@ -5,6 +5,7 @@ import RespondingCommand.RespondFactory;
 
 import java.io.*;
 import java.net.Socket;
+
 import org.json.JSONObject;
 
 public class ClientHandler implements Runnable {
@@ -12,7 +13,7 @@ public class ClientHandler implements Runnable {
     private Socket socket;
     private DataInputStream dataInputStream;
     private DataOutputStream dataOutputStream;
-    private final Data serverData = Data.getInstance();
+    private Data serverData = Data.getInstance();
 
     public ClientHandler(Socket socket) {
         try {
@@ -23,6 +24,7 @@ public class ClientHandler implements Runnable {
         } catch (Exception e) {
             closeEveryThing(socket, dataOutputStream, dataInputStream);
         }
+
     }
 
     @Override
@@ -40,17 +42,17 @@ public class ClientHandler implements Runnable {
                 serverData.addOnlineUser(userName, this);
 
                 RespondFactory factory = RespondFactory.getInstance();
+
                 Respond respond = factory.getRespond(json, socket);
                 respond.handle();
 
             } catch (Exception e) {
                 serverData.deleteOfflineUser(this);
-                System.out.println("Nafar rasft");
-                System.out.println(e.getMessage());
                 closeEveryThing(socket, dataOutputStream, dataInputStream);
-                e.printStackTrace();
+                System.err.println("client disconnected");
                 break;
             }
+
         }
     }
 
@@ -77,4 +79,8 @@ public class ClientHandler implements Runnable {
         }
     }
 
+
+    public Socket getSocket() {
+        return socket;
+    }
 }

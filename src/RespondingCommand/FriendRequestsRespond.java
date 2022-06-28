@@ -155,8 +155,17 @@ public class FriendRequestsRespond extends Respond {
         ArrayList<String> usersList = dataBase.getUsersList();
         JSONArray users = new JSONArray();
 
+        ArrayList<DiscordFriend> friends = dataBase.getFriendsMap().get(info.getString("userName"));
+        ArrayList<String> friendsArray = new ArrayList<>();
+
+        for (DiscordFriend discordFriend : friends) {
+            friendsArray.add(discordFriend.getUserName());
+        }
+
+
         for (String userName : usersList) {
-            if (!(info.getString("userName")).equals(userName)) {
+            //checks if userName is friend or not, if not; you can send friend request
+            if (!(info.getString("userName")).equals(userName) && !friendsArray.contains(userName) ) {
                 users.put(userName);
             }
         }

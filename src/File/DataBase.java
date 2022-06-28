@@ -12,23 +12,15 @@ public class DataBase {
     private final DiscordFile fileManager;
     private ArrayList<String> usersList;
     private HashMap<String, ArrayList<DiscordFriend>> friendsMap;
-
-    private final HashMap<String, ArrayList<DiscordFriend>> blockedFriendsMap;
-    private final HashMap<String, ArrayList<Message>> messagesMap;
     private HashMap<String, ArrayList<FriendRequest>> friendRequestMap;
-
-    public void setFriendRequestMap(HashMap<String, ArrayList<FriendRequest>> friendRequestMap) {
-        this.friendRequestMap = friendRequestMap;
-    }
+    private final HashMap<String, ArrayList<Message>> messagesMap;
 
     private DataBase() {
         fileManager = DiscordFile.getInstance();
         usersList = fileManager.loadUsersList();
         friendsMap = fileManager.loadFriends();
-        blockedFriendsMap = fileManager.loadBlockedFriends();
-        messagesMap = fileManager.loadMessagesMap();
         friendRequestMap = fileManager.loadFriendRequestMap();
-
+        messagesMap = fileManager.loadMessagesMap();
     }
 
 
@@ -40,29 +32,12 @@ public class DataBase {
         return dataBase;
     }
 
-
     public HashMap<String, ArrayList<DiscordFriend>> getFriendsMap() {
-        if (friendsMap == null) {
-            friendsMap =  fileManager.loadFriends();
-        }
-
-        friendRequestMap.forEach((key, value) -> {
-            if (value == null) {
-                value = new ArrayList<>();
-            }
-        });
         return friendsMap;
     }
 
     public ArrayList<String> getUsersList() {
-        if (usersList == null) {
-            usersList =  fileManager.loadUsersList();
-        }
         return usersList;
-    }
-
-    public HashMap<String, ArrayList<DiscordFriend>> getBlockedFriendsMap() {
-        return blockedFriendsMap;
     }
 
     public HashMap<String, ArrayList<Message>> getMessagesMap() {
@@ -70,18 +45,11 @@ public class DataBase {
     }
 
     public HashMap<String, ArrayList<FriendRequest>> getFriendRequestMap() {
-
-        if (friendRequestMap == null) {
-            friendRequestMap = fileManager.loadFriendRequestMap();
-        }
-
-        friendRequestMap.forEach((key, value) -> {
-            if (value == null) {
-                value = new ArrayList<>();
-            }
-        });
-
         return friendRequestMap;
+    }
+
+    public void setFriendRequestMap(HashMap<String, ArrayList<FriendRequest>> friendRequestMap) {
+        this.friendRequestMap = friendRequestMap;
     }
 
 
@@ -94,5 +62,11 @@ public class DataBase {
         setFriendRequestMap(friendRequests);
         fileManager.updateFriendRequestMap(friendRequestMap);
     }
+
+    public void updateMessagesMap(String userName, ArrayList<Message> messages) {
+        messagesMap.put(userName, messages);
+        fileManager.updateMessagesMap(messagesMap);
+    }
+
 
 }

@@ -1,6 +1,9 @@
 package Server;
 
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
 import java.util.HashMap;
 
 public class Data {
@@ -20,12 +23,10 @@ public class Data {
 
     public void addOnlineUser(String user, ClientHandler client) {
         onlineClients.put(user, client);
-        System.out.println("User added: " + client.getUserName());
     }
 
     public void deleteOfflineUser(ClientHandler clientHandler) {
         onlineClients.remove(clientHandler.getUserName());
-        System.out.println("User deleted: " + clientHandler.getUserName());
     }
 
     public boolean isOnline(String userName) {
@@ -33,4 +34,10 @@ public class Data {
             return true;
         } else return false;
     }
+
+    public Socket getSocket(String userName) {
+        return onlineClients.get(userName).getSocket();
+    }
+
+
 }

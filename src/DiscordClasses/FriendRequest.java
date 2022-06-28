@@ -39,5 +39,5 @@ public class FriendRequest implements Serializable {
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
-}
 
+}
