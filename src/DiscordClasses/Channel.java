@@ -1,32 +1,35 @@
 package DiscordClasses;
 
-import Classes.Person;
-
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Channel {
-    private String userName;
+public class Channel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private String name;
     private String pinnedMessage;
-    private ArrayList<Person> users;
     private HashMap<Message, ArrayList<Reaction>> reactions;
 
     public Channel(String userName) {
-        this.userName = userName;
-        users = new ArrayList<>();
+        this.name = userName;
         reactions = new HashMap<>();
     }
 
-    public String getUserName() {
-        return userName;
+    public String getName() {
+        return name;
     }
 
-    public ArrayList<Person> getUsers() {
-        return users;
+    public void setName(String userName) {
+        this.name = userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void addReaction(Message message, Reaction reaction) {
+        if (reactions.get(message) == null) {
+            reactions.put(message, new ArrayList<>());
+        }
     }
 
     public String getPinnedMessage() {
@@ -36,4 +39,10 @@ public class Channel {
     public void setPinnedMessage(String pinnedMessage) {
         this.pinnedMessage = pinnedMessage;
     }
+
+    //if two channel names be equal, means these channels are equal
+    public boolean isEqual(Channel channel) {
+        return channel.name.equals(name);
+    }
+
 }

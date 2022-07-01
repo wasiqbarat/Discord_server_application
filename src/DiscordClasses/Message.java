@@ -1,15 +1,16 @@
 package DiscordClasses;
 
-import Classes.Person;
-
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class Message implements Serializable {
-    private String content;
-    private String sender;
-    private String receiver;
-    private LocalDateTime dateTime;
+    @Serial
+    private static final long serialVersionUID = 3L;
+    private final String content;
+    private final String sender;
+    private final String receiver;
+    private final LocalDateTime dateTime;
     private boolean readStatus;
 
     public Message(String content, String sender, String receiver, LocalDateTime dateTime) {

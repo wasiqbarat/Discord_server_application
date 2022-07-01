@@ -1,4 +1,5 @@
 package Classes;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -7,6 +8,9 @@ import java.io.Serializable;
  * @author wasiq
  */
 public class DiscordUser extends Person implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 7L;
+
     private String password;
 
     public DiscordUser(String userName, String password, String email, String phoneNumber) {

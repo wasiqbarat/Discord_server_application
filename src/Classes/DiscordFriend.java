@@ -1,5 +1,6 @@
 package Classes;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -9,6 +10,9 @@ import java.io.Serializable;
  * @see DiscordUser
  */
 public class DiscordFriend extends Person implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 6L;
+
     boolean isBlocked = false;
 
     public DiscordFriend(String userName, String email, String phoneNumber) {

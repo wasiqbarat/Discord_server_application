@@ -12,7 +12,11 @@ public class LoggedInRespond extends Respond{
     @Override
     public void handle() throws Exception {
 
-        info.put("process", "action");
+        //if user want to go to server panel after login
+        if ( !info.getString("process").equals("serverPanel")) {
+            info.put("process", "action");
+        }
+
         parseMessageToJsonAndSendToClient(info);
     }
 }

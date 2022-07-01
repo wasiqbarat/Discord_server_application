@@ -42,6 +42,9 @@ public class PrivateChatRespond extends Respond {
     private void getMessagesWith() {
         ArrayList<Message> messagesDataBase = dataBase.getMessagesMap().get(info.getString("userName"));
 
+        String userName = info.getString("userName");
+        String messagesWith = info.getString("messagesWith");
+
         if (messagesDataBase == null) {
             messagesDataBase = new ArrayList<>();
         }
@@ -51,8 +54,14 @@ public class PrivateChatRespond extends Respond {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm a");
 
         for (Message message : messagesDataBase) {
-            messages.put(message.getSender() + ": " + message.getContent() + "       " +
-                    "(" + message.getDateTime().format(formatter)+ ")");
+            if (message.getSender().equals(messagesWith) || message.getReceiver().equals(messagesWith) ||
+                    message.getSender().equals(userName) || message.getReceiver().equals(userName)        )
+            {
+
+                messages.put(message.getSender() + ": " + message.getContent() + "       " +
+                        "(" + message.getDateTime().format(formatter)+ ")");
+            }
+
         }
 
         info.put("messages", messages);
@@ -130,7 +139,6 @@ public class PrivateChatRespond extends Respond {
         dataBase.getMessagesMap().forEach((key, value) -> {
             myMessages.add(key);
         });
-
 
         JSONArray messagesJsonArray = new JSONArray();
 

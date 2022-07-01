@@ -33,6 +33,7 @@ public class RespondFactory {
             case "chat" -> respond = new PrivateChatRespond(socket, json);
             case "loggedIn" -> respond = new LoggedInRespond(socket, json);
             case "changePassword" -> respond = new ChangePasswordRespond(socket, json);
+            case "server" -> respond = new ServerResponder(socket, json);
         }
         return respond;
     }

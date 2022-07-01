@@ -1,18 +1,20 @@
 package DiscordClasses;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Role {
+public class Role implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 4L;
     private String name;
-    private final ArrayList<Permission> permissions;
+    private ArrayList<Permission> permissions;
+    private ArrayList<String> members;
 
-    public Role(String name) {
+    public Role(String name, ArrayList<Permission> permissions) {
         this.name = name;
-        permissions = new ArrayList<>();
-    }
-
-    public void addPermission(Permission permission) {
-        permissions.add(permission);
+        this.permissions = permissions;
+        members = new ArrayList<>();
     }
 
     public boolean hasPermission(Permission permission) {
@@ -25,6 +27,10 @@ public class Role {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void addMember(String userName) {
+        members.add(userName);
     }
 
 }

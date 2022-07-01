@@ -49,6 +49,7 @@ public class ClientHandler implements Runnable {
             } catch (Exception e) {
                 serverData.deleteOfflineUser(this);
                 closeEveryThing(socket, dataOutputStream, dataInputStream);
+                e.printStackTrace();
                 System.err.println("client disconnected");
                 break;
             }

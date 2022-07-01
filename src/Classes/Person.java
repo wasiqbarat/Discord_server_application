@@ -1,5 +1,6 @@
 package Classes;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -12,6 +13,9 @@ import java.io.Serializable;
  */
 
 public abstract class Person implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 8L;
+
     protected String userName;
     protected String email;
     protected String phoneNumber;

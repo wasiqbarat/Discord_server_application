@@ -91,6 +91,9 @@ public class FriendRequestsRespond extends Respond {
                     receiver = (Person) inputStream1.readObject();
 
                     senderFriends = dataBase.getFriendsMap().get(senderUserName);
+                    if (senderFriends == null) {
+                        senderFriends = new ArrayList<>();
+                    }
 
                     senderFriends.add(new DiscordFriend(receiver.getUserName(), receiver.getEmail(), receiver.getPhoneNumber()));
                 }
@@ -158,6 +161,10 @@ public class FriendRequestsRespond extends Respond {
         ArrayList<DiscordFriend> friends = dataBase.getFriendsMap().get(info.getString("userName"));
         ArrayList<String> friendsArray = new ArrayList<>();
 
+        if (friends == null) {
+            friends = new ArrayList<>();
+        }
+
         for (DiscordFriend discordFriend : friends) {
             friendsArray.add(discordFriend.getUserName());
         }
@@ -172,6 +179,7 @@ public class FriendRequestsRespond extends Respond {
 
         info.put("users", users);
         info.put("method", "loggedIn");
+
         parseMessageToJsonAndSendToClient(info);
     }
 

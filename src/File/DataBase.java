@@ -22,7 +22,7 @@ public class DataBase {
     private ArrayList<String> usersList;
     private HashMap<String, ArrayList<DiscordFriend>> friendsMap;
     private HashMap<String, ArrayList<FriendRequest>> friendRequestMap;
-    private final HashMap<String, ArrayList<Message>> messagesMap;
+    private HashMap<String, ArrayList<Message>> messagesMap;
 
     private DataBase() {
         fileManager = DiscordFile.getInstance();
@@ -31,7 +31,6 @@ public class DataBase {
         friendRequestMap = fileManager.loadFriendRequestMap();
         messagesMap = fileManager.loadMessagesMap();
     }
-
 
     //singleton structure
     public static DataBase getInstance() {
@@ -42,6 +41,9 @@ public class DataBase {
     }
 
     public HashMap<String, ArrayList<DiscordFriend>> getFriendsMap() {
+        if (friendsMap == null) {
+            friendsMap = fileManager.loadFriends();
+        }
         return friendsMap;
     }
 
@@ -50,10 +52,16 @@ public class DataBase {
     }
 
     public HashMap<String, ArrayList<Message>> getMessagesMap() {
+        if (messagesMap == null) {
+            messagesMap = fileManager.loadMessagesMap();
+        }
         return messagesMap;
     }
 
     public HashMap<String, ArrayList<FriendRequest>> getFriendRequestMap() {
+        if (friendRequestMap == null) {
+            friendRequestMap = fileManager.loadFriendRequestMap();
+        }
         return friendRequestMap;
     }
 
