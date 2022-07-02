@@ -2,12 +2,16 @@ package Server;
 
 import RespondingCommand.Respond;
 import RespondingCommand.RespondFactory;
-
 import java.io.*;
 import java.net.Socket;
-
 import org.json.JSONObject;
 
+/**
+ * this handle all clients that connect to server
+ *
+ * @author wasiq
+ * @see Server
+ */
 public class ClientHandler implements Runnable {
     private String userName;
     private Socket socket;
@@ -33,10 +37,6 @@ public class ClientHandler implements Runnable {
             try {
                 String dataFromClient = dataInputStream.readUTF();
 
-                System.out.println("_____________from client_________________");
-                System.out.println(dataFromClient);
-                System.out.println("_________________________________________");
-
                 JSONObject json = new JSONObject(dataFromClient);
                 userName = json.getString("userName");
                 serverData.addOnlineUser(userName, this);
@@ -50,13 +50,12 @@ public class ClientHandler implements Runnable {
                 serverData.deleteOfflineUser(this);
                 closeEveryThing(socket, dataOutputStream, dataInputStream);
                 e.printStackTrace();
-                System.err.println("client disconnected");
+                System.err.println("> client disconnected");
                 break;
             }
 
         }
     }
-
 
     public String getUserName() {
         return userName;
@@ -79,7 +78,6 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         }
     }
-
 
     public Socket getSocket() {
         return socket;

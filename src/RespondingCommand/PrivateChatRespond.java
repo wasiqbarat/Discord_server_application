@@ -9,12 +9,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class PrivateChatRespond extends Respond {
     private final DataBase dataBase;
@@ -34,10 +34,61 @@ public class PrivateChatRespond extends Respond {
             case "chatAuthentication" -> chatAuthentication();
             case "chatting" -> chatting();
             case "getMessagesWith" -> getMessagesWith();
+            case "sendFile" -> sendFile();
         }
-
     }
 
+
+    private void sendFile() {
+        try {
+            Data data = Data.getInstance();
+            String friendToChat = info.getString("friendToChat").split(" ")[0];
+            File file = new File("Files/Users/UserFile/" + friendToChat + "file.bin");
+
+            if (!file.exists()) {
+                FileOutputStream outputStream = new FileOutputStream(file);
+            }
+
+            FileOutputStream outputStream = new FileOutputStream(file);
+
+            Socket mySocket = data.getSocket(info.getString("userName"));
+            DataInputStream inputStream = new DataInputStream(mySocket.getInputStream());
+
+            int read;
+            int remaining = (int) inputStream.readLong();
+            byte[] buffer = new byte[6000];
+            while ( (read = inputStream.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
+                remaining -= read;
+                outputStream.write(buffer, 0 , read);
+            }
+            inputStream.close();
+            outputStream.close();
+
+
+            //If person is online
+            if (data.isOnline(friendToChat)) {
+                Socket socket = data.getSocket(friendToChat);
+                DataOutputStream outputStream1 = new DataOutputStream(socket.getOutputStream());
+                outputStream1.writeUTF(info.toString());
+
+                File file1 = new File("Files/Users/UserFile/" + friendToChat + "file.bin");
+
+                byte[] buffer1 = new byte[6000];
+                outputStream1.writeLong(file.length());
+                while (inputStream.read(buffer) > 0) {
+                    outputStream.write(buffer);
+                }
+
+                outputStream1.close();
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
     private void getMessagesWith() {
         ArrayList<Message> messagesDataBase = dataBase.getMessagesMap().get(info.getString("userName"));
@@ -57,11 +108,9 @@ public class PrivateChatRespond extends Respond {
             if (message.getSender().equals(messagesWith) || message.getReceiver().equals(messagesWith) ||
                     message.getSender().equals(userName) || message.getReceiver().equals(userName)        )
             {
-
                 messages.put(message.getSender() + ": " + message.getContent() + "       " +
                         "(" + message.getDateTime().format(formatter)+ ")");
             }
-
         }
 
         info.put("messages", messages);
@@ -108,9 +157,7 @@ public class PrivateChatRespond extends Respond {
             dataToFriend.put("userName", info.getString("friendToChat").split(" ")[0]);
 
             dataOutputStream.writeUTF(dataToFriend.toString());
-
         }
-
 
         try {
             info.getBoolean("reply");
@@ -136,9 +183,11 @@ public class PrivateChatRespond extends Respond {
     private void myChats() {
         ArrayList<String> myMessages = new ArrayList<>();
 
-        dataBase.getMessagesMap().forEach((key, value) -> {
+        for (Map.Entry<String, ArrayList<Message>> entry : dataBase.getMessagesMap().entrySet()) {
+            String key = entry.getKey();
+            ArrayList<Message> value = entry.getValue();
             myMessages.add(key);
-        });
+        }
 
         JSONArray messagesJsonArray = new JSONArray();
 

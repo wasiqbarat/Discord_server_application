@@ -3,6 +3,10 @@ package Server;
 import java.net.Socket;
 import java.util.HashMap;
 
+/**
+ * this method stores data about server.
+ * like online users
+ */
 public class Data {
     private static Data data;
 
@@ -12,6 +16,7 @@ public class Data {
         onlineClients = new HashMap<>();
     }
 
+    //singleton class structure
     public static Data getInstance() {
         if (data == null)
             data = new Data();
@@ -27,9 +32,7 @@ public class Data {
     }
 
     public boolean isOnline(String userName) {
-        if (onlineClients.containsKey(userName)) {
-            return true;
-        } else return false;
+        return onlineClients.containsKey(userName);
     }
 
     public Socket getSocket(String userName) {

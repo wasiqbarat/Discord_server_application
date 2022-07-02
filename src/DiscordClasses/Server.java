@@ -7,14 +7,20 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * note that The Server class(this class) is different from Server in Server package
+ * This class is Discord server existent
+ *
+ * @author wasiq
+ */
 public class Server implements Serializable {
     @Serial
     private static final long serialVersionUID = 5L;
 
     private final String owner;
     private String name;
-    private ArrayList<Role> roles;
-    private HashMap<String , Role> usersRole;//this hashmap maps each user to its role
+    private final ArrayList<Role> roles;
+    private final HashMap<String , Role> usersRole;//this hashmap maps each user to its role
 
     public Server(String name, String owner) {
         this.owner = owner;
@@ -27,7 +33,6 @@ public class Server implements Serializable {
         roles.add(role);
         usersRole = new HashMap<>();
     }
-
 
     public Role getUserRoles(String userName) {
         if (usersRole.get(userName) == null) {

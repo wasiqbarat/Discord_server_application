@@ -2,15 +2,19 @@ package File;
 
 import Classes.DiscordFriend;
 import Classes.DiscordUser;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import Classes.Person;
 import DiscordClasses.FriendRequest;
 import DiscordClasses.Message;
 import Exceptions.*;
+
+/**
+ * DiscordFile class do file manipulations
+ *
+ * @author wasiq
+ */
 
 public class DiscordFile {
     private static DiscordFile discordFile = null;
@@ -37,13 +41,11 @@ public class DiscordFile {
                 }
             }
         }
-
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("Files/Users/" + discordUser.getUserName() + ".bin"))) {
             objectOutputStream.writeObject(discordUser);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void signIn(String userName, String password) throws Exception {
@@ -58,7 +60,6 @@ public class DiscordFile {
                         FileInputStream fileInputStream = new FileInputStream("Files/Users/" + user);
                         ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
                         discordUser = (DiscordUser) objectInputStream.readObject();
-
                         fileInputStream.close();
                         objectInputStream.close();
                     }
@@ -79,8 +80,7 @@ public class DiscordFile {
         File user = new File("Files/Users/" + userName + ".bin");
         if (user.exists()) {
             try ( ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(user))){
-                Person person = (Person) objectInputStream.readObject();
-                return person;
+                return (Person) objectInputStream.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -114,20 +114,16 @@ public class DiscordFile {
                 ArrayList<DiscordFriend> arrayList = new ArrayList<>();
                 friendsListHashmap.put(user, arrayList);
             }
-
             try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
                 objectOutputStream.writeObject(friendsListHashmap);
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             return friendsListHashmap;
         }
 
         try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))){
             friendsListHashmap = (HashMap<String, ArrayList<DiscordFriend>>) inputStream.readObject();
-
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -138,14 +134,13 @@ public class DiscordFile {
     public void updateFriendsMap(HashMap<String, ArrayList<DiscordFriend>> friendsMap) {
         File file = new File("DataBase/friendsListHashmap.bin");
 
-        try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(file) )){
+        try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(file))) {
             output.writeObject(friendsMap);
         } catch (IOException e) {
             System.err.println("error in update friends map");
             e.printStackTrace();
         }
     }
-    //------------------------------------------
 
     public HashMap<String, ArrayList<FriendRequest>> loadFriendRequestMap() {
         File file = new File("DataBase/friendRequestMap.bin");
@@ -160,16 +155,13 @@ public class DiscordFile {
                 ArrayList<FriendRequest> arrayList = new ArrayList<>();
                 friendRequestMap.put(user, arrayList);
             }
-
             try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
                 objectOutputStream.writeObject(friendRequestMap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             return friendRequestMap;
         }
-
         try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))){
             friendRequestMap = (HashMap<String, ArrayList<FriendRequest>>) inputStream.readObject();
 
@@ -187,7 +179,6 @@ public class DiscordFile {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
 
@@ -196,30 +187,11 @@ public class DiscordFile {
         String[] usersList1 = usersFolder.list();
 
         ArrayList<String> usersList = new ArrayList<>();
+        assert usersList1 != null;
         for (String user : usersList1 ){
             usersList.add(user.split("\\.")[0]);
         }
-
         return usersList;
-    }
-    ///
-
-    public HashMap<String, ArrayList<DiscordFriend>> loadBlockedFriends() {
-        File file = new File("DataBase/blockedFriendsMap.bin");
-
-        if(!file.exists()) {
-            return new HashMap<>();
-        }
-
-        HashMap<String, ArrayList<DiscordFriend>> blockedFriendsMap = null;
-
-        try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))){
-            blockedFriendsMap = (HashMap<String, ArrayList<DiscordFriend>>) inputStream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return blockedFriendsMap;
     }
 
     public void updateMessagesMap(HashMap<String,ArrayList<Message>> messagesMap) {
@@ -244,22 +216,18 @@ public class DiscordFile {
                 ArrayList<Message> arrayList = new ArrayList<>();
                 messagesMap.put(user, arrayList);
             }
-
             try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
                 objectOutputStream.writeObject(messagesMap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             return messagesMap;
         }
-
         try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))){
             messagesMap = (HashMap<String, ArrayList<Message>>) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-
         return messagesMap;
     }
 }

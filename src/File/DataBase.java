@@ -19,7 +19,7 @@ public class DataBase {
     private static DataBase dataBase = null;
 
     private final DiscordFile fileManager;
-    private ArrayList<String> usersList;
+    private final ArrayList<String> usersList;
     private HashMap<String, ArrayList<DiscordFriend>> friendsMap;
     private HashMap<String, ArrayList<FriendRequest>> friendRequestMap;
     private HashMap<String, ArrayList<Message>> messagesMap;

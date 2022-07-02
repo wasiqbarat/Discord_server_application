@@ -4,6 +4,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * every role has some permissions
+ * evey user has a role in a server
+ */
 public class Role implements Serializable {
     @Serial
     private static final long serialVersionUID = 4L;

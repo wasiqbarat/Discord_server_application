@@ -10,8 +10,7 @@ import File.ServerDataBase;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +33,10 @@ public class ServerResponder extends Respond {
         dataBase = DataBase.getInstance();
     }
 
+    /**
+     * every commands that is related to server(Discord's server) manages by this method
+     * @throws Exception various exceptions may throw
+     */
     @Override
     public void handle() throws Exception {
         try {
@@ -54,6 +57,7 @@ public class ServerResponder extends Respond {
                 case "reactToMessage" -> reactToMessage();
                 case "applyReaction" -> applyReaction();
                 case "applyPinMessage" -> applyPinMessage();
+                case "sendFile" -> sendFile();
             }
             info.put("method", "loggedIn");
 
@@ -64,56 +68,49 @@ public class ServerResponder extends Respond {
         }
     }
 
-    private void applyPinMessage() {
-        String messageForPin = info.getString("messageForPin");
-        String channelName = info.getString("channelName");
-        String serverName = info.getString("serverName");
+    private void sendFile() {
+        try {
+            Data data = Data.getInstance();
+            String friendToChat = info.getString("friendToChat").split(" ")[0];
+            File file = new File("Files/ServerFiles/" + friendToChat + "file.bin");
 
-        ArrayList<Channel> channels = serverDataBase.getServerChannels().get(serverName);
-        if (channels == null) {
-            channels = new ArrayList<>();
-        }
+            FileOutputStream outputStream = new FileOutputStream(file);
 
-        for (Channel channel : channels) {
-            if (channel.getName().equals(channelName)) {
-                channel.setPinnedMessage(messageForPin);
-                break;
+            Socket mySocket = data.getSocket(info.getString("userName"));
+            DataInputStream inputStream = new DataInputStream(mySocket.getInputStream());
+
+            int read;
+            int remaining = (int) inputStream.readLong();
+            byte[] buffer = new byte[6000];
+            while ((read = inputStream.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
+                remaining -= read;
+                outputStream.write(buffer, 0, read);
             }
-        }
-        serverDataBase.updateServerChannels(serverName, channels);
+            inputStream.close();
+            outputStream.close();
 
-        info.remove("messageForPin");
+            //If person is online, so send file to him/her
+            for (String users : serverDataBase.getServerUsers().get(info.getString("serverName"))) {
+                if (data.isOnline(users)) {
+                    Socket socket = data.getSocket(friendToChat);
+                    DataOutputStream outputStream1 = new DataOutputStream(socket.getOutputStream());
+                    outputStream1.writeUTF(info.toString());
 
-        info.put("method", "loggedIn");
-        info.put("process", "channelPanel");
-    }
+                    File file1 = new File("Files/ChannelFiles/" + friendToChat + "file.bin");
 
-    private void applyReaction() {
-        String message = info.getString("messageForReaction");
-        String channelName = info.getString("channelName");
-
-        String content = message.split(" ")[1];
-
-        HashMap<String, ArrayList<Message>> channelMessagesMap = serverDataBase.getChannelMessages();
-
-        ArrayList<Message> messages = channelMessagesMap.get(channelName);
-
-        String jsonReaction = info.getString("reaction");
-
-        Reaction reaction = Reaction.getReaction(jsonReaction);
-
-        for (Message message1 : messages) {
-            if (message1.getContent().equals(content)) {
-                message1.addReaction(reaction);
-                break;
+                    byte[] buffer1 = new byte[6000];
+                    outputStream1.writeLong(file.length());
+                    while (inputStream.read(buffer) > 0) {
+                        outputStream.write(buffer);
+                    }
+                    outputStream1.close();
+                }
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        channelMessagesMap.put(channelName, messages);
-        serverDataBase.updateChannelMessages(channelMessagesMap);
-
-        info.put("method", "loggedIn");
-        info.put("process", "channelPanel");
     }
 
     private void reactToMessage() {
@@ -122,6 +119,7 @@ public class ServerResponder extends Respond {
 
     /**
      * authenticate if a member is admin or not
+     *
      * @throws PermissionException if user is not admin
      */
     private void authentication() throws PermissionException {
@@ -164,11 +162,12 @@ public class ServerResponder extends Respond {
         }
     }
 
+
     private void chatHistoryAccess(String action) {
         String channelName = info.getString("channelName");
 
         ArrayList<Message> messages = serverDataBase.getChannelMessages().get(channelName);
-        if ( messages == null) {
+        if (messages == null) {
             messages = new ArrayList<>();
         }
 
@@ -179,7 +178,7 @@ public class ServerResponder extends Respond {
             messagesJson.put(message.getSender() + ": " + message.getContent() + "    (" + message.getDateTime().format(formatter) + ")  " + message.reactionsToString());
         }
 
-        info.put("messages" , messagesJson);
+        info.put("messages", messagesJson);
         switch (action) {
             case "chatHistoryAccess" -> info.put("process", "displayChannelMessages");
             case "reactToMessage" -> info.put("process", "reactToMessage");
@@ -209,6 +208,20 @@ public class ServerResponder extends Respond {
         info.put("process", "displayPinnedMessage");
     }
 
+    private void getServerChannels() {
+        String serverName = info.getString("serverName");
+        ArrayList<Channel> channels = serverDataBase.getServerChannels().get(serverName);
+
+        JSONArray jsonArray = new JSONArray();
+        for (Channel channel : channels) {
+            jsonArray.put(channel.getName());
+        }
+
+        info.put("channels", jsonArray);
+        info.put("method", "loggedIn");
+        info.put("process", "serverChannelsPanel");
+    }
+
     private void channelChat() throws IOException {
         String userName = info.getString("userName");
         String channelName = info.getString("channelName");
@@ -222,7 +235,7 @@ public class ServerResponder extends Respond {
             ArrayList<Message> messages = new ArrayList<>();
             messages.add(message);
             channelMessages.put(channelName, messages);
-        }else {
+        } else {
             ArrayList<Message> messages = channelMessages.get(channelName);
             messages.add(message);
             channelMessages.put(channelName, messages);
@@ -231,16 +244,14 @@ public class ServerResponder extends Respond {
 
         ArrayList<String> serverUsers = serverDataBase.getServerUsers().get(serverName);
 
-        if ( serverUsers == null) {
+        if (serverUsers == null) {
             serverUsers = new ArrayList<>();
             serverDataBase.updateServerUsers(serverName, serverUsers);
         }
 
-
         for (String user : serverUsers) {
             if (data.isOnline(user) && !user.equals(userName)) {
                 DataOutputStream dataOutputStream = new DataOutputStream(data.getSocket(user).getOutputStream());
-
                 JSONObject dataToFriend = new JSONObject();
 
                 dataToFriend.put("exception", false);
@@ -259,20 +270,6 @@ public class ServerResponder extends Respond {
 
         info.put("method", "loggedIn");
         info.put("process", "channelPanel");
-    }
-
-    private void getServerChannels() {
-        String serverName = info.getString("serverName");
-        ArrayList<Channel> channels = serverDataBase.getServerChannels().get(serverName);
-
-        JSONArray jsonArray = new JSONArray();
-        for (Channel channel : channels) {
-            jsonArray.put(channel.getName());
-        }
-
-        info.put("channels", jsonArray);
-        info.put("method", "loggedIn");
-        info.put("process", "serverChannelsPanel");
     }
 
     private void applyCreatingChannel() throws InvalidChannelName {
@@ -312,6 +309,94 @@ public class ServerResponder extends Respond {
 
     }
 
+    private void applyMemberAdd() {
+        String friendToAdd = info.getString("friendToAdd");
+        String serverName = info.getString("serverName");
+        String role = info.getString("role");
+        String userName = info.getString("userName");
+
+        ArrayList<String> serverMembers = serverDataBase.getServerUsers().get(serverName);
+        ArrayList<Server> myFriendsServers = serverDataBase.loadUserServers().get(friendToAdd);
+
+        if (serverMembers == null) {
+            System.err.println("is null");
+            serverMembers = new ArrayList<>();
+        }
+        if (myFriendsServers == null) {
+            System.err.println("is null");
+            myFriendsServers = new ArrayList<>();
+        }
+
+        serverMembers.add(friendToAdd);
+
+
+        Server server = serverDataBase.getServer(serverName);
+
+        server.setRoleForUser(friendToAdd, role);
+
+        myFriendsServers.add(server);
+
+        serverDataBase.updateServers(server);
+        serverDataBase.updateServerUsers(serverName, serverMembers);
+        serverDataBase.updateUserServers(friendToAdd, myFriendsServers);
+
+        info.remove("friendToAdd");
+        info.put("process", "serverPanel");
+    }
+
+    private void applyReaction() {
+        String message = info.getString("messageForReaction");
+        String channelName = info.getString("channelName");
+
+        String content = message.split(" ")[1];
+
+        HashMap<String, ArrayList<Message>> channelMessagesMap = serverDataBase.getChannelMessages();
+
+        ArrayList<Message> messages = channelMessagesMap.get(channelName);
+
+        String jsonReaction = info.getString("reaction");
+
+        Reaction reaction = Reaction.getReaction(jsonReaction);
+
+        for (Message message1 : messages) {
+            if (message1.getContent().equals(content)) {
+                message1.addReaction(reaction);
+                break;
+            }
+        }
+
+        channelMessagesMap.put(channelName, messages);
+        serverDataBase.updateChannelMessages(channelMessagesMap);
+
+        info.put("method", "loggedIn");
+        info.put("process", "channelPanel");
+    }
+
+    private void applyPinMessage() {
+        String messageForPin = info.getString("messageForPin");
+        String channelName = info.getString("channelName");
+        String serverName = info.getString("serverName");
+
+        ArrayList<Channel> channels = serverDataBase.getServerChannels().get(serverName);
+        if (channels == null) {
+            channels = new ArrayList<>();
+        }
+
+        for (Channel channel : channels) {
+            if (channel.getName().equals(channelName)) {
+                channel.setPinnedMessage(messageForPin);
+                break;
+            }
+        }
+        serverDataBase.updateServerChannels(serverName, channels);
+
+        info.remove("messageForPin");
+
+        info.put("method", "loggedIn");
+        info.put("process", "channelPanel");
+    }
+
+
     private void newServer() throws InvalidServerName {
         String serverName = info.getString("serverName");
         ArrayList<Server> servers = serverDataBase.getServers();
@@ -346,7 +431,6 @@ public class ServerResponder extends Respond {
         info.put("process", "serverPanel");
 
     }
-
 
     private void getServerUsers(String action) {
         ArrayList<String> members = serverDataBase.getServerUsers().get(info.getString("serverName"));
@@ -475,46 +559,12 @@ public class ServerResponder extends Respond {
         info.put("operation", "Role Added successfully.");
     }
 
+    //if user want to go to server panel this method redirect user to server panel
     private void serverPanel() {
         Role role = serverDataBase.getServer(info.getString("serverName")).getUserRoles(info.getString("userName"));
 
         info.put("role", role.getName());
         info.put("method", "loggedIn");
-        info.put("process", "serverPanel");
-    }
-
-    private void applyMemberAdd() {
-        String friendToAdd = info.getString("friendToAdd");
-        String serverName = info.getString("serverName");
-        String role = info.getString("role");
-        String userName = info.getString("userName");
-
-        ArrayList<String> serverMembers = serverDataBase.getServerUsers().get(serverName);
-        ArrayList<Server> myFriendsServers = serverDataBase.loadUserServers().get(friendToAdd);
-
-        if (serverMembers == null) {
-            System.err.println("is null");
-            serverMembers = new ArrayList<>();
-        }
-        if (myFriendsServers == null) {
-            System.err.println("is null");
-            myFriendsServers = new ArrayList<>();
-        }
-
-        serverMembers.add(friendToAdd);
-
-
-        Server server = serverDataBase.getServer(serverName);
-
-        server.setRoleForUser(friendToAdd, role);
-
-        myFriendsServers.add(server);
-
-        serverDataBase.updateServers(server);
-        serverDataBase.updateServerUsers(serverName, serverMembers);
-        serverDataBase.updateUserServers(friendToAdd, myFriendsServers);
-
-        info.remove("friendToAdd");
         info.put("process", "serverPanel");
     }
 

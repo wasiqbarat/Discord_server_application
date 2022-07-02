@@ -4,6 +4,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * Server is class that handles multiple clients
+ *
+ * @author wasiq
+ * @see ClientHandler
+ */
 public class Server {
     private ServerSocket serverSocket;
 

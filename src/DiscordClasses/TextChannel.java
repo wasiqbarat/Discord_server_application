@@ -6,5 +6,4 @@ public class TextChannel extends Channel{
         super(userName);
     }
 
-
 }

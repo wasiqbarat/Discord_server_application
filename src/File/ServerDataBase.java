@@ -3,8 +3,6 @@ package File;
 import DiscordClasses.Channel;
 import DiscordClasses.Message;
 import DiscordClasses.Server;
-import Exceptions.SeverNotFoundException;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +10,8 @@ import java.util.Iterator;
 
 /**
  * ServerDataBase stores and manages all Discord Servers data.
+ *
+ * Note that server is a kind of group-like existent.
  *
  * @author wasiq
  * @see Server
@@ -32,6 +32,7 @@ public class ServerDataBase {
         channelMessages = loadChannelMessages();
         userServers = loadUserServers();
 
+        //one method used for load users
         channelUsers = loadUsers("channel");
         serverUsers = loadUsers("server");
     }
@@ -43,10 +44,15 @@ public class ServerDataBase {
         return serverDataBase;
     }
 
+    /**
+     * after changes, we can reload servers from file
+     */
     public void reloadServers() {
         servers = loadServers();
     }
 
+
+    //update functions. after changes in database these methods update file to save data forever.
     public void updateChannelMessages(HashMap<String , ArrayList<Message>> channelMessages) {
         this.channelMessages = channelMessages;
 
@@ -110,7 +116,7 @@ public class ServerDataBase {
     public void updateServers(Server server) {
         Iterator<Server> iterator = servers.iterator();
         while (iterator.hasNext()) {
-            Server server1 = (Server) iterator.next();
+            Server server1 = iterator.next();
             if (server.isEqual(server1)) {
                 iterator.remove();
                 servers.add(server);
@@ -150,6 +156,7 @@ public class ServerDataBase {
         }
         return userServers;
     }
+
     public HashMap<String, ArrayList<String>> loadUsers(String channelOrServer) {
         File file = new File("DataBase/" + channelOrServer + "Users.bin");
         HashMap<String, ArrayList<String>> users = null;
@@ -170,6 +177,7 @@ public class ServerDataBase {
         }
         return users;
     }
+
     public HashMap<String, ArrayList<Message>> loadChannelMessages() {
         File file = new File("DataBase/channelMessages.bin");
         HashMap<String, ArrayList<Message>> messages = null;
@@ -192,6 +200,7 @@ public class ServerDataBase {
 
         return messages;
     }
+
     public ArrayList<Server> loadServers() {
         File file = new File("DataBase/servers.bin");
 
@@ -214,6 +223,7 @@ public class ServerDataBase {
         }
         return servers;
     }
+
     public HashMap<String, ArrayList<Channel>> loadServerChannels() {
         File file = new File("DataBase/serverChannels.bin");
 
@@ -247,12 +257,14 @@ public class ServerDataBase {
         }
         return servers;
     }
+
     public HashMap<String, ArrayList<Channel>> getServerChannels() {
         if (serverChannels == null) {
             serverChannels = loadServerChannels();
         }
         return serverChannels;
     }
+
     public Server getServer(String serverName) {
         if (servers == null) {
             servers = loadServers();
@@ -266,24 +278,28 @@ public class ServerDataBase {
 
         return null;
     }
+
     public HashMap<String, ArrayList<Message>> getChannelMessages() {
         if (channelMessages == null) {
             channelMessages = loadChannelMessages();
         }
         return channelMessages;
     }
+
     public HashMap<String, ArrayList<String>> getChannelUsers() {
         if (channelUsers == null) {
             channelUsers = loadUsers("channel");
         }
         return channelUsers;
     }
+
     public HashMap<String, ArrayList<String>> getServerUsers() {
         if (serverUsers == null) {
             serverUsers = loadUsers("server");
         }
         return serverUsers;
     }
+
     public HashMap<String, ArrayList<Server>> getUserServers() {
         if (userServers == null) {
             userServers = loadUserServers();

@@ -1,5 +1,11 @@
 package DiscordClasses;
 
+/**
+ * Admins has various permissions
+ * these permissions are constant
+ *
+ * @author wasiq
+ */
 public enum Permission {
     CHANNEL_CREATE,
     CHANNEL_REMOVE,

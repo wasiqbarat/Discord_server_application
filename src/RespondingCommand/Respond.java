@@ -5,7 +5,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-
+/**
+ * Respond class responds and provide data to client
+ *
+ * info is commands that received from client
+ */
 public abstract class Respond {
     protected Socket socket;
     protected JSONObject info;
@@ -17,6 +21,10 @@ public abstract class Respond {
 
     public abstract void handle() throws Exception;
 
+    /**
+     * if exception throws by methods this method send exception to client
+     * @param e is that exception which throws by methods
+     */
     protected void parseErrorToJsonAndSendToClient(Exception e) {
         info.put("exception", true);
         info.put("cause", e.getMessage());
@@ -30,13 +38,12 @@ public abstract class Respond {
 
     }
 
+    /**
+     * this method send final data to client
+     * @param object is the final data that provides from responders
+     */
     protected void parseMessageToJsonAndSendToClient(JSONObject object) {
         try {
-            System.out.println("__________________this is sending to client____");
-            System.out.println(object);
-            System.out.println("_______________________________________________");
-
-
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
             dataOutputStream.writeUTF(object.toString());
         } catch (IOException ex) {

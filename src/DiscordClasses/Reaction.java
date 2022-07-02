@@ -1,5 +1,10 @@
 package DiscordClasses;
 
+/**
+ * reaction to message is like dislike...
+ *
+ * @author wasiq
+ */
 public enum Reaction {
     LIKE,
     DISLIKE,

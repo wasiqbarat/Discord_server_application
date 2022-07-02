@@ -5,6 +5,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+/**
+ * Message class is message existent
+ *
+ * @author wasiq
+ */
 public class Message implements Serializable {
     @Serial
     private static final long serialVersionUID = 3L;
@@ -13,7 +18,7 @@ public class Message implements Serializable {
     private final String sender;
     private final String receiver;
     private final LocalDateTime dateTime;
-    private boolean readStatus;
+
     private ArrayList<Reaction> reactions;
 
     public Message(String content, String sender, String receiver, LocalDateTime dateTime) {
@@ -22,11 +27,6 @@ public class Message implements Serializable {
         this.receiver = receiver;
         this.dateTime = dateTime;
         reactions = new ArrayList<>();
-        readStatus = false;
-    }
-
-    public ArrayList<Reaction> getReactions() {
-        return reactions;
     }
 
     public void addReaction(Reaction reaction) {
@@ -70,10 +70,6 @@ public class Message implements Serializable {
 
     public LocalDateTime getDateTime() {
         return dateTime;
-    }
-
-    public boolean isReadStatus() {
-        return readStatus;
     }
 
 }

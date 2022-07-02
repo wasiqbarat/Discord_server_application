@@ -19,14 +19,6 @@ public class DiscordFriend extends Person implements Serializable {
         super(userName, email, phoneNumber);
     }
 
-    public void block() {
-        isBlocked = true;
-    }
-
-    public void unBlock() {
-        isBlocked = false;
-    }
-
     public boolean getBlockStatus() {
         return isBlocked;
     }

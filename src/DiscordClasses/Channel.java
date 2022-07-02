@@ -3,6 +3,11 @@ package DiscordClasses;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * Channel existent is like groups that peoples can share messages
+ *
+ * @author wasiq
+ */
 public class Channel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -17,10 +22,6 @@ public class Channel implements Serializable {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String userName) {
-        this.name = userName;
     }
 
     public String getPinnedMessage() {
