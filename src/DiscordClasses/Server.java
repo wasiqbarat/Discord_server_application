@@ -1,5 +1,7 @@
 package DiscordClasses;
 
+import File.ServerDataBase;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,12 +28,12 @@ public class Server implements Serializable {
         usersRole = new HashMap<>();
     }
 
+
     public Role getUserRoles(String userName) {
         if (usersRole.get(userName) == null) {
             ArrayList<Permission> permissions = new ArrayList<>();
             permissions.add(Permission.USERS_ADD);
-            Role role = new Role("defaultRole", permissions);//every channel has a default role
-            usersRole.put(userName, role);
+            usersRole.put(userName, new Role("defaultRole", permissions));
         }
         return usersRole.get(userName);
     }
@@ -45,10 +47,22 @@ public class Server implements Serializable {
         usersRole.put(userName, role);
     }
 
-    public void setDefaultRole(String userName) {
-        ArrayList<Permission> permissions = new ArrayList<>();
-        permissions.add(Permission.USERS_ADD);
-        usersRole.put(userName, new Role("defaultRole", permissions));
+    public void setRoleForUser(String userName, String roleName) {
+        Role role = null;
+        for (Role role1 : roles) {
+            if (role1.getName().equals(roleName) ) {
+                role1.addMember(userName);
+                role = role1;
+                System.out.println("roles is true");
+                break;
+            }
+        }
+
+        System.out.println(role);
+        usersRole.put(userName, role);
+
+        ServerDataBase.getInstance().updateServers(this);
+        ServerDataBase.getInstance().reloadServers();
     }
 
     public void addRole(Role role) {

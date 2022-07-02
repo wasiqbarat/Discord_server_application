@@ -2,8 +2,6 @@ package DiscordClasses;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Channel implements Serializable {
     @Serial
@@ -11,11 +9,10 @@ public class Channel implements Serializable {
 
     private String name;
     private String pinnedMessage;
-    private HashMap<Message, ArrayList<Reaction>> reactions;
+
 
     public Channel(String userName) {
         this.name = userName;
-        reactions = new HashMap<>();
     }
 
     public String getName() {
@@ -24,12 +21,6 @@ public class Channel implements Serializable {
 
     public void setName(String userName) {
         this.name = userName;
-    }
-
-    public void addReaction(Message message, Reaction reaction) {
-        if (reactions.get(message) == null) {
-            reactions.put(message, new ArrayList<>());
-        }
     }
 
     public String getPinnedMessage() {

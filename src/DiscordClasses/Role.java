@@ -25,6 +25,10 @@ public class Role implements Serializable {
         return name;
     }
 
+    public boolean isMember(String userName) {
+        return members.contains(userName);
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -33,4 +37,12 @@ public class Role implements Serializable {
         members.add(userName);
     }
 
+    @Override
+    public String toString() {
+        return "Role{" +
+                "name='" + name + '\'' +
+                ", permissions=" + permissions +
+                ", members=" + members +
+                '}';
+    }
 }

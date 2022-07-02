@@ -36,8 +36,26 @@ public class ServerDataBase {
         serverUsers = loadUsers("server");
     }
 
-    public void updateChannelMessages(String channelName, Message message) { //most be completed
+    public static ServerDataBase getInstance() {   //singleton class structure
+        if (serverDataBase == null) {
+            serverDataBase = new ServerDataBase();
+        }
+        return serverDataBase;
+    }
 
+    public void reloadServers() {
+        servers = loadServers();
+    }
+
+    public void updateChannelMessages(HashMap<String , ArrayList<Message>> channelMessages) {
+        this.channelMessages = channelMessages;
+
+        File file = new File("DataBase/channelMessages.bin");
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file))){
+            outputStream.writeObject(channelMessages);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateChannelUsers(String channelName, ArrayList<String> users) {
@@ -60,42 +78,6 @@ public class ServerDataBase {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public Server getServer(String serverName) {
-        if (servers == null) {
-            servers = loadServers();
-        }
-
-        for (Server server : servers) {
-            if (server.getName().equals(serverName)) {
-                return server;
-            }
-        }
-
-        return null;
-    }
-
-    public HashMap<String, ArrayList<Server>> loadUserServers() {
-        File file = new File("DataBase/userServers.bin");
-        HashMap<String, ArrayList<Server>> userServers = null;
-
-        if (!file.exists()) {
-            userServers = new HashMap<>();
-            try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file))) {
-                outputStream.writeObject(userServers);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return userServers;
-        }
-
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
-            userServers = (HashMap<String, ArrayList<Server>>) inputStream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return userServers;
     }
 
     public void updateUserServers(String user, ArrayList<Server> servers) {
@@ -125,6 +107,49 @@ public class ServerDataBase {
 
     }
 
+    public void updateServers(Server server) {
+        Iterator<Server> iterator = servers.iterator();
+        while (iterator.hasNext()) {
+            Server server1 = (Server) iterator.next();
+            if (server.isEqual(server1)) {
+                iterator.remove();
+                servers.add(server);
+                break;
+            }
+        }
+
+        File file = new File("DataBase/servers.bin");
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file))) {
+            outputStream.writeObject(servers);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    //load functions
+    public HashMap<String, ArrayList<Server>> loadUserServers() {
+        File file = new File("DataBase/userServers.bin");
+        HashMap<String, ArrayList<Server>> userServers = null;
+
+        if (!file.exists()) {
+            userServers = new HashMap<>();
+            try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file))) {
+                outputStream.writeObject(userServers);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return userServers;
+        }
+
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
+            userServers = (HashMap<String, ArrayList<Server>>) inputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return userServers;
+    }
     public HashMap<String, ArrayList<String>> loadUsers(String channelOrServer) {
         File file = new File("DataBase/" + channelOrServer + "Users.bin");
         HashMap<String, ArrayList<String>> users = null;
@@ -145,7 +170,6 @@ public class ServerDataBase {
         }
         return users;
     }
-
     public HashMap<String, ArrayList<Message>> loadChannelMessages() {
         File file = new File("DataBase/channelMessages.bin");
         HashMap<String, ArrayList<Message>> messages = null;
@@ -168,7 +192,6 @@ public class ServerDataBase {
 
         return messages;
     }
-
     public ArrayList<Server> loadServers() {
         File file = new File("DataBase/servers.bin");
 
@@ -191,68 +214,6 @@ public class ServerDataBase {
         }
         return servers;
     }
-
-    public ArrayList<Server> getServers() {
-        if (servers == null) {
-            servers = loadServers();
-        }
-        return servers;
-    }
-
-    public HashMap<String, ArrayList<Channel>> getServerChannels() {
-        if (serverChannels == null) {
-            serverChannels = loadServerChannels();
-        }
-        return serverChannels;
-    }
-
-    public HashMap<String, ArrayList<Message>> getChannelMessages() {
-        if (channelMessages == null) {
-            channelMessages = loadChannelMessages();
-        }
-        return channelMessages;
-    }
-
-    public HashMap<String, ArrayList<String>> getChannelUsers() {
-        if (channelUsers == null) {
-            channelUsers = loadUsers("channel");
-        }
-        return channelUsers;
-    }
-
-    public HashMap<String, ArrayList<String>> getServerUsers() {
-        if (serverUsers == null) {
-            serverUsers = loadUsers("server");
-        }
-        return serverUsers;
-    }
-
-    public HashMap<String, ArrayList<Server>> getUserServers() {
-        if (userServers == null) {
-            userServers = loadUserServers();
-        }
-        return userServers;
-    }
-
-    public void updateServers(Server server) {
-        Iterator<Server> iterator = servers.iterator();
-        while (iterator.hasNext()) {
-            Server server1 = (Server) iterator.next();
-            if (server.isEqual(server1)) {
-                iterator.remove();
-                servers.add(server);
-                break;
-            }
-        }
-
-        File file = new File("DataBase/servers.bin");
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file))) {
-            outputStream.writeObject(servers);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public HashMap<String, ArrayList<Channel>> loadServerChannels() {
         File file = new File("DataBase/serverChannels.bin");
 
@@ -278,11 +239,56 @@ public class ServerDataBase {
         return serverChannels;
     }
 
-    public static ServerDataBase getInstance() {   //singleton class structure
-        if (serverDataBase == null) {
-            serverDataBase = new ServerDataBase();
+
+    //getter functions
+    public ArrayList<Server> getServers() {
+        if (servers == null) {
+            servers = loadServers();
         }
-        return serverDataBase;
+        return servers;
+    }
+    public HashMap<String, ArrayList<Channel>> getServerChannels() {
+        if (serverChannels == null) {
+            serverChannels = loadServerChannels();
+        }
+        return serverChannels;
+    }
+    public Server getServer(String serverName) {
+        if (servers == null) {
+            servers = loadServers();
+        }
+
+        for (Server server : servers) {
+            if (server.getName().equals(serverName)) {
+                return server;
+            }
+        }
+
+        return null;
+    }
+    public HashMap<String, ArrayList<Message>> getChannelMessages() {
+        if (channelMessages == null) {
+            channelMessages = loadChannelMessages();
+        }
+        return channelMessages;
+    }
+    public HashMap<String, ArrayList<String>> getChannelUsers() {
+        if (channelUsers == null) {
+            channelUsers = loadUsers("channel");
+        }
+        return channelUsers;
+    }
+    public HashMap<String, ArrayList<String>> getServerUsers() {
+        if (serverUsers == null) {
+            serverUsers = loadUsers("server");
+        }
+        return serverUsers;
+    }
+    public HashMap<String, ArrayList<Server>> getUserServers() {
+        if (userServers == null) {
+            userServers = loadUserServers();
+        }
+        return userServers;
     }
 
 }
